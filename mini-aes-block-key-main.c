@@ -446,6 +446,7 @@ void print_n_choose_2() {
 	}
 }
 
+#define PRINT_TO_FILE
 /*
  * This function deals with fixing a plaintext and varying the keys to
  * search for collision
@@ -453,6 +454,7 @@ void print_n_choose_2() {
 void check_for_same_key() {
 	struct utsname uname_pointer; // to obtain system information
 	u16 key[16];
+	u16 keyRef[16]; // the reference key, in our case, the all-zero key
 	u32 masterkey = 0x0000C3F0;
 	u64 i;
 	u8 j, k;
@@ -475,12 +477,15 @@ void check_for_same_key() {
 	 * new structure for file name (starting 2 Jul 2018)
 	 *  - out-mini-aes[key length in bits]: e.g.: out-mini-aes16
 	 *  - [number of rounds]r
+	 *  - nod: no details (optional), if stated, then details regarding the keys will not be printed
 	 *  - pf2: print format version 2
 	 */
+	if ((ou=fopen("out-mini-aes16-2r-nod-pf2.txt", "w")) == NULL)
+		pf("Cannot open file");
 
 	// deprecated as at 5 Jul 2018
-	if ((ou=fopen("out-mini-aes16-3r.txt", "w")) == NULL)
-		pf("Cannot open file");
+	//if ((ou=fopen("out-mini-aes16-3r.txt", "w")) == NULL)
+	//	pf("Cannot open file");
 
 	clock_t t1;
 	time_t w1;
@@ -509,8 +514,8 @@ void check_for_same_key() {
 		masterkey = 0;
 		// [0] KEY SCHEDULE
 		// the typical MiniAES
-		keySchedule(masterkey, key, keylen, &Nr);
-        Nr = 3; // override, if you want
+		keySchedule(masterkey, keyRef, keylen, &Nr);
+        Nr = 2; // override, if you want
 
 		// [A] testing no key schedule but subkey the same in all rounds
         // the MiniAES-A
@@ -545,7 +550,7 @@ void check_for_same_key() {
 			// [0] KEY SCHEDULE
 			// the typical MiniAES
 			keySchedule(masterkey, key, keylen, &Nr);
-            Nr = 3; // override, is you want
+            Nr = 2; // override, is you want
 
 			// [A] testing no key schedule but subkey the same in all rounds
             // the MiniAES-A
@@ -573,6 +578,8 @@ void check_for_same_key() {
 			*/
 
 			if (encrypt(c, key, Nr) == x) {
+
+#ifdef PRINT_TO_FILE
 				// old way of printing
 				/*
 				fpf(ou, "(m,k) = (%x %x)\n", c, i);
@@ -588,6 +595,7 @@ void check_for_same_key() {
 				for (j=0; j<(Nr+1); j++)
 					fpf(ou, "%04X ", key[j]);
 				fpf(ou, "\n");
+#endif
 
 				//same_key_analysis(c, key, Nr);
 				count++; // counting number of keys that yield the collision
@@ -597,8 +605,15 @@ void check_for_same_key() {
 		if (count > 1) {
 			count_plaintexts++; // increment the plaintext count
 
-			fpf(ou, "Total: %d; p = %x c = %x\n\n", count, cx, x);
+			// print the all-zero keys
+#ifdef PRINT_TO_FILE
+			fpf(ou, "%x :: ", masterkey);
+			for (j=0; j<(Nr+1); j++)
+				fpf(ou, "%04X ", keyRef[j]);
+			fpf(ou, "\n");
 
+			fpf(ou, "Total: %d; p = %x c = %x\n\n", count, cx, x);
+#endif
 			total_all += count;
 			total_comb += n_choose_2[count];
 
