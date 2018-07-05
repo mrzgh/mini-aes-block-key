@@ -475,7 +475,10 @@ void check_for_same_key() {
 	 * new structure for file name (starting 2 Jul 2018)
 	 *  - out-mini-aes[key length in bits]: e.g.: out-mini-aes16
 	 *  - [number of rounds]r
+	 *  - pf2: print format version 2
 	 */
+
+	// deprecated as at 5 Jul 2018
 	if ((ou=fopen("out-mini-aes16-3r.txt", "w")) == NULL)
 		pf("Cannot open file");
 
@@ -570,8 +573,21 @@ void check_for_same_key() {
 			*/
 
 			if (encrypt(c, key, Nr) == x) {
+				// old way of printing
+				/*
 				fpf(ou, "(m,k) = (%x %x)\n", c, i);
-				fpf(ou, "subkeys = "); for (j=0; j<(Nr+1); j++) fpf(ou, "%04X ", key[j]); fpf(ou, "\n");
+				fpf(ou, "subkeys = ");
+
+				for (j=0; j<(Nr+1); j++)
+					fpf(ou, "%04X ", key[j]);
+				*/
+
+				// new print format to save space (print format version 2: pf2):
+				// key :: subkeys
+				fpf(ou, "%x :: ", i);
+				for (j=0; j<(Nr+1); j++)
+					fpf(ou, "%04X ", key[j]);
+				fpf(ou, "\n");
 
 				//same_key_analysis(c, key, Nr);
 				count++; // counting number of keys that yield the collision
@@ -581,7 +597,7 @@ void check_for_same_key() {
 		if (count > 1) {
 			count_plaintexts++; // increment the plaintext count
 
-			fpf(ou, "Total: %d; c = %x\n\n", count, x);
+			fpf(ou, "Total: %d; p = %x c = %x\n\n", count, cx, x);
 
 			total_all += count;
 			total_comb += n_choose_2[count];

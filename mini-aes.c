@@ -8810,6 +8810,17 @@ u16 oneRoundEnc_print(u16 x, u16 k) {
 	return x;
 }
 
+/*
+ * The encryption algorithm.
+ *
+ * Inputs:
+ *  - x		: plaintext
+ *  - key   : array of 16-bit subkeys
+ *  - Nr    : number of block cipher rounds
+ *
+ * Returns:
+ *  - ciphertext
+ */
 u16 encrypt(u16 x, u16 *key, u8 Nr) {
 	u8 i;
 
