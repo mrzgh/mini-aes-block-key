@@ -446,7 +446,7 @@ void print_n_choose_2() {
 	}
 }
 
-#define PRINT_TO_FILE
+//#define PRINT_TO_FILE
 /*
  * This function deals with fixing a plaintext and varying the keys to
  * search for collision
