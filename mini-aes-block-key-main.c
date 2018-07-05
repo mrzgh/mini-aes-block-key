@@ -264,7 +264,7 @@ u8 x_xor_sx_imp[93] = {
 	0xf3, 0xf9, 0xfa, 0xfd, 0xff
 };
 
-int main() {
+int main2() {
 	int i, N = 16777216;
 	clock_t t1;
 	time_t w1;
@@ -286,7 +286,7 @@ int main() {
 	return 0;
 }
 
-int main2() {
+int main() {
 	//u16 key[3] = { 0xC3F0, 0x30FF, 0x6696 };
 	u16 key[16];
 	u32 masterkey = 0x0000C3F0;
@@ -476,7 +476,7 @@ void check_for_same_key() {
 	 *  - out-mini-aes[key length in bits]: e.g.: out-mini-aes16
 	 *  - [number of rounds]r
 	 */
-	if ((ou=fopen("out-mini-aes16-2r.txt", "w")) == NULL)
+	if ((ou=fopen("out-mini-aes16-3r.txt", "w")) == NULL)
 		pf("Cannot open file");
 
 	clock_t t1;
@@ -507,7 +507,7 @@ void check_for_same_key() {
 		// [0] KEY SCHEDULE
 		// the typical MiniAES
 		keySchedule(masterkey, key, keylen, &Nr);
-        Nr = 2; // override, if you want
+        Nr = 3; // override, if you want
 
 		// [A] testing no key schedule but subkey the same in all rounds
         // the MiniAES-A
@@ -542,7 +542,7 @@ void check_for_same_key() {
 			// [0] KEY SCHEDULE
 			// the typical MiniAES
 			keySchedule(masterkey, key, keylen, &Nr);
-            Nr = 2; // override, is you want
+            Nr = 3; // override, is you want
 
 			// [A] testing no key schedule but subkey the same in all rounds
             // the MiniAES-A
@@ -595,13 +595,13 @@ void check_for_same_key() {
 	fpf(ou, "Average number keys per plaintext that yield collision: %f\n\n", total_all*1.0/count_plaintexts*1.0);
 	fpf(ou, "Number of colliding pairs: %d\n\n", total_comb);
 
-	fpf(ou, "\nDONE!!\n");
+	fpf(ou, "\nDONE!!\n\n");
 
 	fpf(ou,"System name - %s \n", uname_pointer.sysname);
 	fpf(ou,"Nodename    - %s \n", uname_pointer.nodename);
 	fpf(ou,"Release     - %s \n", uname_pointer.release);
 	fpf(ou,"Version     - %s \n", uname_pointer.version);
-	fpf(ou,"Machine     - %s \n", uname_pointer.machine);
+	fpf(ou,"Machine     - %s \n\n", uname_pointer.machine);
 	//fpf(ou,"Domain name - %s n", uname_pointer.domainname);
 
 	fpf(ou, "CPU Time : %f seconds\n", (clock() - t1) / (double)(CLOCKS_PER_SEC));
