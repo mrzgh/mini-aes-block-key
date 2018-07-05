@@ -541,7 +541,7 @@ void check_for_same_key() {
 		*/
 
 		//fpf(ou, "subkeys = "); for (i=0; i<(Nr+1); i++) fpf(ou, "%04X ", key[i]); fpf(ou, "\n");
-		x = encrypt(cx, key, Nr);
+		x = encrypt(cx, keyRef, Nr);
 
 		//same_key_analysis(cx, key, Nr);
 		for (i = 1; i < max; ++i) {
