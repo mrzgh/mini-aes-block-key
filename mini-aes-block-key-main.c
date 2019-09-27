@@ -447,6 +447,11 @@ void print_n_choose_2() {
 }
 
 #define PRINT_TO_FILE
+
+// types of ciphers
+//#define TYPE_NORMAL
+#define TYPE_A
+//#define TYPE_B
 /*
  * This function deals with fixing a plaintext and varying the keys to
  * search for collision
@@ -480,7 +485,16 @@ void check_for_same_key() {
 	 *  - nod: no details (optional), if stated, then details regarding the keys will not be printed
 	 *  - pf2: print format version 2
 	 */
+
+#ifdef TYPE_NORMAL
 	if ((ou=fopen("out-mini-aes16-2r-nod-pf2.txt", "w")) == NULL)
+#endif
+#ifdef TYPE_A
+	if ((ou=fopen("out-mini-aes16a-6r-nod-pf2.txt", "w")) == NULL)
+#endif
+#ifdef TYPE_B
+	if ((ou=fopen("out-mini-aes16b-2r-nod-pf2.txt", "w")) == NULL)
+#endif
 		pf("Cannot open file");
 
 	// deprecated as at 5 Jul 2018
@@ -508,28 +522,32 @@ void check_for_same_key() {
 
 	clen = (u64)pow(2, 16);
 
+	// number of rounds
+	Nr = 6;
+
 	for (ci = 0; ci < clen; ++ci) {
 
 		cx = c = ci;
 		masterkey = 0;
+
 		// [0] KEY SCHEDULE
+#ifdef TYPE_NORMAL
 		// the typical MiniAES
 		keySchedule(masterkey, keyRef, keylen, &Nr);
         Nr = 2; // override, if you want
+#endif
 
 		// [A] testing no key schedule but subkey the same in all rounds
         // the MiniAES-A
-		/*
-		Nr = 2;
+#ifdef TYPE_A
 		for (j = 0; j < (Nr+1); ++j) {
 			key[j] = masterkey;
 		}
-		*/
+#endif
 
 		// [B] testing no key schedule: the 1st subkey is the same as masterkey, the rest are all zeros
         // the MiniAES-B
-		/*
-		Nr = 10;
+#ifdef TYPE_B
 		key[0] = masterkey;
 		for (j = 1; j < (Nr+1); ++j) {
 			key[j] = 0;
@@ -538,7 +556,7 @@ void check_for_same_key() {
 		// for keylen=6, 8
 		key[ 0] = ((masterkey & 0xffff0000) >> 16);
 		key[Nr] =   masterkey & 0x0000ffff;
-		*/
+#endif
 
 		//fpf(ou, "subkeys = "); for (i=0; i<(Nr+1); i++) fpf(ou, "%04X ", key[i]); fpf(ou, "\n");
 		x = encrypt(cx, keyRef, Nr);
@@ -548,23 +566,22 @@ void check_for_same_key() {
 			masterkey = i;
 
 			// [0] KEY SCHEDULE
+#ifdef TYPE_NORMAL
 			// the typical MiniAES
 			keySchedule(masterkey, key, keylen, &Nr);
-            Nr = 2; // override, is you want
+#endif
 
 			// [A] testing no key schedule but subkey the same in all rounds
             // the MiniAES-A
-			/*
-			Nr = 2;
+#ifdef TYPE_A
 			for (j = 0; j < (Nr+1); ++j) {
 				key[j] = masterkey;
 			}
-			*/
+#endif
 
 			// [B] testing no key schedule: the 1st subkey is the same as masterkey, the rest are all zeros
             // the MiniAES-B
-			/*
-			Nr = 10;
+#ifdef TYPE_B
 
 			key[0] = masterkey;
 			for (j = 1; j < (Nr+1); ++j) {
@@ -575,7 +592,7 @@ void check_for_same_key() {
 			key[ 0] = ((masterkey & 0xffff0000) >> 16);
 			key[Nr] =   masterkey & 0x0000ffff;
 
-			*/
+#endif
 
 			if (encrypt(c, key, Nr) == x) {
 
